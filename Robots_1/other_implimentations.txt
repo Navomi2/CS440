@@ -1,0 +1,107 @@
+def point_segment_distance(p, s):
+proj_b_on_a = (np.dot(vector_b, vector_a)/np.dot(vector_a, vector_a)) * vector_a
+    proj_b_on_a = (np.dot(vector_b, vector_a)/np.linalg.norm(vector_a - vector_b))
+    dist = np.sqrt((closest_point[0] - p[0])**2 + (closest_point[1] - p[1])**2)
+    # print(f"proj_b_on_a = {proj_b_on_a}")
+    closest_point = s0 + proj_b_on_a
+    a_dot_b = np.dot(vector_a, vector_b)
+    alpha = 0.0
+    if (len_a != 0 and len_b != 0):
+        alpha = math.asin(a_dot_b / (len_a * len_b))
+    print(f"alpha = {math.degrees(alpha)}")
+    dist = len_b * math.cos(alpha)
+    return dist
+
+def do_segments_intersect(s1, s2):
+    """Determine whether segment1 intersects segment2.
+
+        Args:
+            s1: A tuple of coordinates indicating the endpoints of segment1.
+            s2: A tuple of coordinates indicating the endpoints of segment2.
+
+        Return:
+            True if line segments intersect, False if not.
+    """
+    s1 = np.array(s1)
+    s2 = np.array(s2)
+    s1[0] = np.array(s1[0])
+    s1[1] = np.array(s1[1])
+    s2[0] = np.array(s2[0])
+    s2[1] = np.array(s2[1])
+
+    s1_vect = s1[1] - s1[0]
+    s2_vect = s2[1] - s2[0]
+    cross_product = np.cross(s1_vect, s2_vect)
+
+    if (cross_product == 0): #if parallel: true only if same line
+        if (point_segment_distance((s1[0][0], s1[0][1]), ((s2[0][0], s2[0][1]), (s2[1][0], s2[1][1]))) == 0
+            or point_segment_distance((s1[1][0], s1[1][1]), ((s2[0][0], s2[0][1]), (s2[1][0], s2[1][1]))) == 0):
+            return True
+        else:
+            return False
+    else: #else: true if intersection is on the line
+        s1_slope = None
+        s2_slope = None
+        if ((s1[1][0] - s1[0][0]) != 0):
+          s1_slope  = ((s1[1][1] - s1[0][1]) / (s1[1][0] - s1[0][0]))
+        if ((s2[1][0] - s2[0][0]) != 0):
+            s2_slope = ((s2[1][1] - s2[0][1]) / (s2[1][0] - s2[0][0]))
+
+        point = s2[0]
+        if s1_slope != s2_slope:
+            A = np.array([[1, -s1_slope],[1, -s2_slope]])
+            b = np.array([-s1_slope*s1[0][0] + s1[0][1], -s2_slope*s2[0][0] + s2[0][1]])
+            x = np.linalg.solve(A,b)
+            point = x
+
+        if ((min(s1[0][0], s1[1][0]) <= point[0] <= max(s1[0][0], s1[1][0])) 
+            and (min(s1[0][1], s1[1][1]) <= point[1] <= max(s1[0][1], s1[1][1]))
+            and (min(s2[0][0], s2[1][0]) <= point[0] <= max(s2[0][0], s2[1][0]))
+            and (min(s2[0][1], s2[1][1]) <= point[1] <= max(s2[0][1], s2[1][1]))):
+            return True
+        else:
+            return False
+     if (o_s20_with_s1 == o_s21_with_s1): #if same orientation, no intersect
+        return False
+
+    o_s10_with_s2 = get_orientation(s1[0], s2)
+    o_s11_with_s2 = get_orientation(s1[1], s2)
+
+    if (((o_s20_with_s1 == o_s21_with_s1) and (o_s20_with_s1 == o_s21_with_s1))
+        or ((o_s20_with_s1 != o_s21_with_s1) and (o_s20_with_s1 != o_s21_with_s1))): #if same orientation pattern, intersect
+        return True
+
+does_alien_touch_wall:
+# if (abs(x - endx) <= radius or abs(x - startx) <= radius) and (abs(y - endy) <= radius  or abs(y - starty) <= radius):
+#if (abs(head[0] - endx) <= length/2 or abs(tail[0] - startx) <= length/2) and (abs(y - starty) + abs(y - endy) <= (endy - starty)):
+                # print(abs(x - startx) <= length/2)
+                # x_under_len = (abs(x - endx) <= length/2 or abs(x - startx) <= length/2)
+                # y_under_width = (abs(y - endy) <= width  or abs(y - starty) <= width)
+                # if ((x_under_len and y_under_width) or (x_under_len and point_segment_distance((x,y), ((startx, starty), (endx, endy))) <= length/2)):    
+                # if (point_segment_distance((x,y), wall) <= width): 
+# s1 = ((x - (length/2), y - width), (x + (length/2), y - width))
+            # s2 = ((x + (length/2), y - width), (x + (length/2), y + width))
+            # s3 = ((x + (length/2), y + width), (x - (length/2), y + width))
+            # s4 = ((x - (length/2), y + width), (x - (length/2), y - width))
+
+            if head[0] == tail[0]: #if vertical change sides
+                # s1 = ((x - width, y - (length/2)), (x + width, y - (length/2)))
+                # s2 = ((x + width, y - (length/2)), (x + width, y + (length/2)))
+                # s3 = ((x + width, y + (length/2)), (x - width, y + (length/2)))
+                # s4 = ((x - width, y + (length/2)), (x - width, y - (length/2)))
+
+            else: #horizontal
+                # print("horizontal")
+                # if ((do_segments_intersect(s1, wall_segment) == True) 
+                #     or (do_segments_intersect(s2, wall_segment) == True)
+                #     or (do_segments_intersect(s3, wall_segment) == True)
+                #     or (do_segments_intersect(s4, wall_segment) == True)):
+                #     # print("TRUE")
+                #     return True
+                # if ((segment_distance(s1, wall_segment) == 0) 
+                #     or (segment_distance(s2, wall_segment) == 0)
+                #     or (segment_distance(s3, wall_segment) == 0)
+                #     or (segment_distance(s4, wall_segment) == 0)):
+                #     # print("TRUE")
+                #     return True
+    # print("FALSE")
